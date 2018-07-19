@@ -1,8 +1,8 @@
 class Body {
-    constructor(arena, x, y) {
-        this.position = {x:x, y:y};
-        this.velocity = {x:0, y:0};
-        this.acceleration = {x:0, y:0};
+    constructor(arena, x, y, mass) {
+        this.position = {x: x, y: y};
+        this.velocity = {x: 0, y: 0};
+        this.mass = mass;
         this.arena = arena;
         this.ctx = this.arena.context;
     }
@@ -12,19 +12,22 @@ class Body {
         return Math.sqrt(Math.pow(this.velocity.x, 2) + Math.pow(this.velocity.y, 2));
     }
 
-    // Accelerates and moves the body
-    move() {
-        this.velocity.x += this.acceleration.x;
-        this.velocity.y += this.acceleration.y;
+    // Accelerates the body according to a force
+    applyForce(force) {
+        this.velocity.x += (force.x / this.mass);
+        this.velocity.y += (force.y / this.mass);
+    }
 
+    // Moves the body
+    move() {
         this.position.x += this.velocity.x;
         this.position.y += this.velocity.y;
     }
 }
 
 class Ball extends Body {
-    constructor(arena, x, y, radius) {
-        super(arena, x, y);
+    constructor(arena, x, y, radius, mass) {
+        super(arena, x, y, mass);
         this.radius = radius;
 
         this.draw();

@@ -6,7 +6,7 @@ class Arena {
         // Bodies in the arena
         this.balls = [];
 
-        this._gravity = 0;
+        this.gravity = 0;
 
         // Creating the DOM-element
         this.canvas = document.createElement("canvas");
@@ -15,25 +15,10 @@ class Arena {
         this.context = this.canvas.getContext("2d");
         document.body.insertBefore(this.canvas, document.body.childNodes[0]);
     }
-    
-    set gravity(g) {
-        // Gives all bodies an accelration
-        // Balls
-        this.balls.forEach(ball => {
-            ball.acceleration.y += (g - this._gravity);
-        });
-        this._gravity = g;
-    }
-
-    get gravity() {
-        return this._gravity;
-    }
 
     // Creates a ball object and draws it to the canvas
-    createBall(x, y, radius) {
-        this.balls.push(new Ball(this, x, y, radius));
-        // Give the new ball gravity
-        this.balls[this.balls.length - 1].acceleration.y += this._gravity;
+    createBall(x, y, radius, mass) {
+        this.balls.push(new Ball(this, x, y, radius, mass));
     }
 
     // Stuff to do every frame
@@ -44,6 +29,7 @@ class Arena {
         // Update all the bodies and redraw
         // Balls
         this.balls.forEach(ball => {
+            if(this.gravity) ball.applyForce({x: 0, y: (ball.mass * this.gravity)});
             ball.move();
             ball.draw();
         });
