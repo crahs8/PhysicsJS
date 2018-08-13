@@ -1,10 +1,11 @@
 class Body {
-    constructor(arena, x, y, mass) {
+    constructor(arena, x, y, density) {
         this.position = {x: x, y: y};
         this.velocity = {x: 0, y: 0};
-        this.mass = mass;
+        this.density = density;
         this.arena = arena;
         this.ctx = this.arena.context;
+
     }
 
     // Calculates the magnitude of the velocity (speed)
@@ -40,17 +41,20 @@ class Body {
 }
 
 class Ball extends Body {
-    constructor(arena, x, y, radius, mass) {
-        super(arena, x, y, mass);
+    constructor(arena, x, y, radius, density) {
+        super(arena, x, y, density);
         this.radius = radius;
+        this.center = this.position;
+        this.mass = density * this.area;
 
+        console.log("The mass of the created body is", this.mass);
         this.draw();
     }
 
-    get center() {
-        return this.position;
+    get area() {
+        return Math.PI * Math.pow(this.radius, 2);
     }
-
+   
     // Draws the ball to the canvas
     draw() {
         this.ctx.beginPath();
