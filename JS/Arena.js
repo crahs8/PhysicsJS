@@ -53,7 +53,7 @@ class Arena {
         this.stopSimulation();
 
         // Start creating a body
-        let mouse = this.getLocalMousePos(evt);
+        const mouse = this.getLocalMousePos(evt);
         this.creatingBody.creating = true;
         this.creatingBody.origin = mouse;
         this.creatingBody.current = mouse;
@@ -68,9 +68,9 @@ class Arena {
         this.creatingBody.creating = false;
         switch(this.options.type) {
             case "ball":
-                let distX = this.creatingBody.current.x - this.creatingBody.origin.x
-                let distY = this.creatingBody.current.y - this.creatingBody.origin.y
-                let radius = Math.sqrt(Math.pow(distX, 2) + Math.pow(distY, 2));
+                const distX = this.creatingBody.current.x - this.creatingBody.origin.x
+                const distY = this.creatingBody.current.y - this.creatingBody.origin.y
+                const radius = Math.sqrt(Math.pow(distX, 2) + Math.pow(distY, 2));
                 this.createBall(this.creatingBody.origin.x, this.creatingBody.origin.y,
                                 radius, this.options.density);
         }
@@ -103,9 +103,9 @@ class Arena {
     drawOutline() {
         switch(this.options.type) {
             case "ball":
-                let distX = this.creatingBody.current.x - this.creatingBody.origin.x
-                let distY = this.creatingBody.current.y - this.creatingBody.origin.y
-                let radius = Math.sqrt(Math.pow(distX, 2) + Math.pow(distY, 2));
+                const distX = this.creatingBody.current.x - this.creatingBody.origin.x
+                const distY = this.creatingBody.current.y - this.creatingBody.origin.y
+                const radius = Math.sqrt(Math.pow(distX, 2) + Math.pow(distY, 2));
                 this.context.beginPath();
                 this.context.arc(this.creatingBody.origin.x, this.creatingBody.origin.y,
                                  radius, 0, 2*Math.PI);
@@ -119,7 +119,13 @@ class Arena {
         this.context.clearRect(0, 0, this.width, this.height);
 
         // Update all the bodies and redraw
-        this.bodies.forEach(body => {
+        this.bodies.forEach((body, bodyIndex) => {
+            // Check for collisions, finds one collision pr. pair of colliding bodies
+            for(let i = bodyIndex; i < this.bodies.length; i++) {
+                const otherBody = this.bodies[i];
+                if(otherBody != body && body.collidesWith(otherBody)) console.log("Collision detected!");
+            }
+
             // Downward gravity
             if(this.downGravity) body.applyForce({x: 0, y: (body.mass * this.downGravity)});
 
@@ -127,9 +133,9 @@ class Arena {
             if(this.interGravity) {
                 this.bodies.forEach(otherBody => {
                     if(otherBody != body) {
-                        let distance = Body.distance(body, otherBody);
-                        let vector = body.vectorTo(otherBody);
-                        let gForce = {
+                        const distance = Body.distance(body, otherBody);
+                        const vector = body.vectorTo(otherBody);
+                        const gForce = {
                             x: this.interGravity * body.mass * otherBody.mass * vector.x / Math.pow(distance, 3),
                             y: this.interGravity * body.mass * otherBody.mass * vector.y / Math.pow(distance, 3)
                         };
@@ -138,6 +144,7 @@ class Arena {
                 });
             }
         });
+        
         this.bodies.forEach(body => {
             body.move();
             body.draw();

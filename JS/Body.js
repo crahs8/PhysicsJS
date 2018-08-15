@@ -13,10 +13,18 @@ class Body {
         return Math.sqrt(Math.pow(this.velocity.x, 2) + Math.pow(this.velocity.y, 2));
     }
 
+    // Sets the velocity if the speed is changed
+    set speed(newSpeed) {
+        // Saving as const, since speed is calculated each time this.speed is called
+        const currSpeed = this.speed;
+        this.velocity.x *= newSpeed / currSpeed;
+        this.velocity.y *= newSpeed / currSpeed;
+    }
+
     // Accelerates the body according to a force
     applyForce(force) {
-        this.velocity.x += (force.x / this.mass);
-        this.velocity.y += (force.y / this.mass);
+        this.velocity.x += force.x / this.mass;
+        this.velocity.y += force.y / this.mass;
     }
 
     // Moves the body
@@ -27,15 +35,15 @@ class Body {
 
     // Returns the vector that points to a body
     vectorTo(body) {
-        let x = (body.center.x - this.center.x);
-        let y = (body.center.y - this.center.y);
+        let x = body.center.x - this.center.x;
+        let y = body.center.y - this.center.y;
         return {x: x, y: y};
     }
 
     // Returns the distance between two bodies
     static distance(body1, body2) {
-        let rx = (body1.center.x - body2.center.x);
-        let ry = (body1.center.y - body2.center.y);
+        let rx = body1.center.x - body2.center.x;
+        let ry = body1.center.y - body2.center.y;
         return Math.sqrt(Math.pow(rx, 2) + Math.pow(ry, 2));
     }
 }
@@ -60,5 +68,13 @@ class Ball extends Body {
         this.ctx.beginPath();
         this.ctx.arc(this.position.x, this.position.y, this.radius, 0, 2*Math.PI);
         this.ctx.stroke();
+    }
+
+    // Checks if the Ball is colliding with a specified body
+    collidesWith(body) {
+        // Ball
+        if(body instanceof Ball) {
+            return (Body.distance(this, body) < this.radius + body.radius);
+        }
     }
 }
