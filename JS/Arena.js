@@ -123,7 +123,11 @@ class Arena {
             // Check for collisions, finds one collision pr. pair of colliding bodies
             for(let i = bodyIndex; i < this.bodies.length; i++) {
                 const otherBody = this.bodies[i];
-                if(otherBody != body && body.collidesWith(otherBody)) console.log("Collision detected!");
+                if(otherBody != body && body.collidesWith(otherBody)) {
+                    // Temporary collision logic
+                    body.velocity = {x: -body.velocity.x, y: -body.velocity.y};
+                    otherBody.velocity = {x: -otherBody.velocity.x, y: -otherBody.velocity.y};
+                }
             }
 
             // Downward gravity

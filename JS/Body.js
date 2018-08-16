@@ -35,15 +35,15 @@ class Body {
 
     // Returns the vector that points to a body
     vectorTo(body) {
-        let x = body.center.x - this.center.x;
-        let y = body.center.y - this.center.y;
+        const x = body.center.x - this.center.x;
+        const y = body.center.y - this.center.y;
         return {x: x, y: y};
     }
 
     // Returns the distance between two bodies
     static distance(body1, body2) {
-        let rx = body1.center.x - body2.center.x;
-        let ry = body1.center.y - body2.center.y;
+        const rx = body1.center.x - body2.center.x;
+        const ry = body1.center.y - body2.center.y;
         return Math.sqrt(Math.pow(rx, 2) + Math.pow(ry, 2));
     }
 }
