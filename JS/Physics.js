@@ -8,12 +8,12 @@ function init() {
     arena.createBall(250, 50, 30, 1);
     arena.createBall(250, 450, 15, 1);
     arena.interGravity = 0.5;
-    arena.bodies[0].velocity = {x: -0.27, y: 0.08};
-    arena.bodies[1].velocity = {x: 8, y: -5};
-    arena.bodies[2].velocity = {x: 5, y: 10};
+    arena.bodies[0].velocity = new Vector2d(-0.27, 0.08);
+    arena.bodies[1].velocity = new Vector2d(8, -5);
+    arena.bodies[2].velocity = new Vector2d(5, 10);
 
     // Simulation of thrown ball
-    //arena.bodies[0].velocity = {x: 10, y:-15};
+    //arena.bodies[0].velocity = new Vector2d(10, -15);
     //arena.downGravity = 0.4;
 }
 

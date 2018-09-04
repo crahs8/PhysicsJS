@@ -1,7 +1,7 @@
 class Body {
     constructor(arena, x, y, density) {
-        this.position = {x: x, y: y};
-        this.velocity = {x: 0, y: 0};
+        this.position = new Vector2d(x, y);
+        this.velocity = new Vector2d(0, 0);
         this.density = density;
         this.arena = arena;
         this.ctx = this.arena.context;
@@ -10,41 +10,34 @@ class Body {
 
     // Calculates the magnitude of the velocity (speed)
     get speed() {
-        return Math.sqrt(Math.pow(this.velocity.x, 2) + Math.pow(this.velocity.y, 2));
+        return this.velocity.length;
     }
 
     // Sets the velocity if the speed is changed
     set speed(newSpeed) {
-        // Saving as const, since speed is calculated each time this.speed is called
-        const currSpeed = this.speed;
-        this.velocity.x *= newSpeed / currSpeed;
-        this.velocity.y *= newSpeed / currSpeed;
+        this.velocity = this.velocity.scale(newSpeed / this.speed)
     }
 
     // Accelerates the body according to a force
     applyForce(force) {
-        this.velocity.x += force.x / this.mass;
-        this.velocity.y += force.y / this.mass;
+        this.velocity = this.velocity.add(force.scale(1 / this.mass));
     }
 
     // Moves the body
     move() {
-        this.position.x += this.velocity.x;
-        this.position.y += this.velocity.y;
+        this.position = this.position.add(this.velocity);
+        this.center = this.position;
     }
 
     // Returns the vector that points to a body
     vectorTo(body) {
-        const x = body.center.x - this.center.x;
-        const y = body.center.y - this.center.y;
-        return {x: x, y: y};
+        return new Vector2d(body.center.x - this.center.x, body.center.y - this.center.y);
     }
 
     // Returns the distance between two bodies
     static distance(body1, body2) {
-        const rx = body1.center.x - body2.center.x;
-        const ry = body1.center.y - body2.center.y;
-        return Math.sqrt(Math.pow(rx, 2) + Math.pow(ry, 2));
+        const vector = body1.vectorTo(body2);
+        return vector.length;
     }
 }
 

@@ -32,8 +32,8 @@ class Arena {
         // For when the user is dragging the mouse in order to create a body
         this.creatingBody = {
             creating: false,
-            origin: {x: 0, y: 0},
-            current: {x: 0, y: 0}
+            origin: new Vector2d(0, 0),
+            current: new Vector2d(0, 0)
         };
 
         // Adding click event listeners
@@ -68,9 +68,8 @@ class Arena {
         this.creatingBody.creating = false;
         switch(this.options.type) {
             case "ball":
-                const distX = this.creatingBody.current.x - this.creatingBody.origin.x
-                const distY = this.creatingBody.current.y - this.creatingBody.origin.y
-                const radius = Math.sqrt(Math.pow(distX, 2) + Math.pow(distY, 2));
+                const vector = this.creatingBody.current.subtract(this.creatingBody.origin);
+                const radius = vector.length;
                 this.createBall(this.creatingBody.origin.x, this.creatingBody.origin.y,
                                 radius, this.options.density);
         }
@@ -93,19 +92,15 @@ class Arena {
     // Takes a mouseEvent as input and outputs the
     // mouse's local position in the canvas
     getLocalMousePos(evt) {
-        return {
-            x: evt.clientX - this.boundingRect.left,
-            y: evt.clientY - this.boundingRect.top
-        };
+        return new Vector2d(evt.clientX - this.boundingRect.left, evt.clientY - this.boundingRect.top);
     }  
     
     // Draws an outline used for creating bodies
     drawOutline() {
         switch(this.options.type) {
             case "ball":
-                const distX = this.creatingBody.current.x - this.creatingBody.origin.x
-                const distY = this.creatingBody.current.y - this.creatingBody.origin.y
-                const radius = Math.sqrt(Math.pow(distX, 2) + Math.pow(distY, 2));
+                const vector = this.creatingBody.current.subtract(this.creatingBody.origin);
+                const radius = vector.length;
                 this.context.beginPath();
                 this.context.arc(this.creatingBody.origin.x, this.creatingBody.origin.y,
                                  radius, 0, 2*Math.PI);
@@ -120,32 +115,28 @@ class Arena {
 
         // Update all the bodies and redraw
         this.bodies.forEach((body, bodyIndex) => {
-            // Check for collisions, finds one collision pr. pair of colliding bodies
-            for(let i = bodyIndex; i < this.bodies.length; i++) {
-                const otherBody = this.bodies[i];
-                if(otherBody != body && body.collidesWith(otherBody)) {
-                    // Temporary collision logic
-                    body.velocity = {x: -body.velocity.x, y: -body.velocity.y};
-                    otherBody.velocity = {x: -otherBody.velocity.x, y: -otherBody.velocity.y};
-                }
-            }
-
-            // Downward gravity
-            if(this.downGravity) body.applyForce({x: 0, y: (body.mass * this.downGravity)});
+            // Downward gravity<
+            if(this.downGravity) body.applyForce(new Vector2d(0, (body.mass * this.downGravity)));
 
             // Inter-body gravity
             if(this.interGravity) {
                 this.bodies.forEach(otherBody => {
                     if(otherBody != body) {
-                        const distance = Body.distance(body, otherBody);
                         const vector = body.vectorTo(otherBody);
-                        const gForce = {
-                            x: this.interGravity * body.mass * otherBody.mass * vector.x / Math.pow(distance, 3),
-                            y: this.interGravity * body.mass * otherBody.mass * vector.y / Math.pow(distance, 3)
-                        };
+                        const distance = vector.length;
+                        const gForce = vector.scale(this.interGravity * body.mass * otherBody.mass / Math.pow(distance, 3));
                         body.applyForce(gForce);
                     }
                 });
+            }
+            
+            // Check for collisions, finds one collision pr. pair of colliding bodies
+            for(let i = bodyIndex; i < this.bodies.length; i++) {
+                const otherBody = this.bodies[i];
+                if(otherBody != body && body.collidesWith(otherBody)) {
+                    // Collision detected
+                    
+                }
             }
         });
         
