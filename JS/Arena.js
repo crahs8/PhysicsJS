@@ -29,6 +29,13 @@ class Arena {
             density: 1
         };
 
+        this.densityText = document.getElementById('densitytext');
+        this.densitySlider =  document.getElementById('density');
+        this.densitySlider.oninput = () => {
+            this.options.density = Math.pow(10, this.densitySlider.value - 1);
+            this.densityText.innerHTML = "Density: " + this.options.density;
+        };
+
         // For when the user is dragging the mouse in order to create a body
         this.creatingBody = {
             creating: false,
@@ -45,6 +52,9 @@ class Arena {
     // Creates a ball object and draws it to the canvas
     createBall(x, y, radius, density) {
         this.bodies.push(new Ball(this, x, y, radius, density));
+    }
+    createRectangle(x, y, width, height, density) {
+        this.bodies.push(new Rectangle(this, x,  y, width, height, density));
     }
 
     // Event handler for mouse down
@@ -66,12 +76,17 @@ class Arena {
 
         // Finish creating a body
         this.creatingBody.creating = false;
+        const vector = this.creatingBody.current.subtract(this.creatingBody.origin);
         switch(this.options.type) {
             case "ball":
-                const vector = this.creatingBody.current.subtract(this.creatingBody.origin);
                 const radius = vector.length;
                 this.createBall(this.creatingBody.origin.x, this.creatingBody.origin.y,
                                 radius, this.options.density);
+                break;
+            case "rectangle":
+                this.createRectangle(this.creatingBody.origin.x, this.creatingBody.origin.y,
+                                     vector.x, vector.y, this.options.density);
+                break;
         }
     }
 
@@ -97,14 +112,21 @@ class Arena {
     
     // Draws an outline used for creating bodies
     drawOutline() {
+        const vector = this.creatingBody.current.subtract(this.creatingBody.origin);
         switch(this.options.type) {
             case "ball":
-                const vector = this.creatingBody.current.subtract(this.creatingBody.origin);
                 const radius = vector.length;
                 this.context.beginPath();
                 this.context.arc(this.creatingBody.origin.x, this.creatingBody.origin.y,
                                  radius, 0, 2*Math.PI);
                 this.context.stroke();
+                break;
+            case "rectangle":
+                this.context.beginPath();
+                this.context.rect(this.creatingBody.origin.x, this.creatingBody.origin.y,
+                                  vector.x, vector.y);
+                this.context.stroke();
+                break;
         }
     }
 
@@ -135,7 +157,7 @@ class Arena {
                 const otherBody = this.bodies[i];
                 if(otherBody != body && body.collidesWith(otherBody)) {
                     // Collision detected
-                    
+                    console.log("Collision detected:", body, otherBody);
                 }
             }
         });
