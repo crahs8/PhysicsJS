@@ -109,3 +109,42 @@ class Rectangle extends Body {
         }
     }
 }
+
+class Rectangle extends Body {
+    constructor(arena, x, y, width, height, density) {
+        super(arena, x, y, density);
+        this.width = width;
+        this.height = height;
+        this.area = width * height;
+        this.mass = density * this.area;
+
+        console.log("The mass of the created body is", this.mass);
+        this.draw();
+    }
+
+    get center() {
+        return this.position.add([this.width / 2, this.height / 2]);
+    }
+
+    // Draws the rectangle to the canvas
+    draw() {
+        this.ctx.beginPath();
+        this.ctx.rect(this.position.x, this.position.y, this.width, this.height);
+        this.ctx.stroke();
+    }
+    // Checks if the Ball is colliding with a specified body
+    collidesWith(body) {
+        // Ball
+        /*if(body instanceof Ball) {
+            return (Body.distance(this, body) < this.radius + body.radius);
+        }*/
+        if(body instanceof Rectangle) {
+            // Check if rectangles are to either side of each other
+            if(body.position.x > (this.position.x + this.width) || this.position.x > (body.position.x + body.width))
+                return false;
+            if(body.position.y > (this.position.y + this.height) || this.position.y > (body.position.y + body.height))
+                return false;
+            return true;
+        }
+    }
+}
